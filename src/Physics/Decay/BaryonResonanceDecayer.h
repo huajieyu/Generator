@@ -47,8 +47,7 @@ public:
   void           InhibitDecay   (int pdg, TDecayChannel * dc=0) const;
   void           UnInhibitDecay (int pdg, TDecayChannel * dc=0) const;
  
-  //libo did
-  double DealsDeltaNGamma(int id_mother, int ichannel, double W) const;
+  double BRDeltaNGammaNPi(int id_mother, int ichannel, double W) const;
 
 
   // overload the Algorithm::Configure() methods to load private data
