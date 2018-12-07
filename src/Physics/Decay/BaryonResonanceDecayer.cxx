@@ -101,7 +101,6 @@ double BaryonResonanceDecayer::BRDeltaNGammaNPi(int id_mother, int ichannel, dou
 
   //double width0= 0.12;
   //double width0= utils::res::Width             (resonance);
-  double width0=genie::constants::DeltaWidth0;
  
   double m_2   = TMath::Power(m, 2);
   double mN_2  = TMath::Power(mN,   2);
@@ -110,16 +109,10 @@ double BaryonResonanceDecayer::BRDeltaNGammaNPi(int id_mother, int ichannel, dou
   double m_aux2= TMath::Power(mN-mPi, 2);
   // double rDelta= 0.81*FMTOGEV;
 
-
   double BRPi01   = genie::constants::BRNpi1;
   double BRPi02   = genie::constants::BRNpi2;
-  double BRgamma0 = genie::constants::totBRNgamma;
-  double widPi0   = width0 * genie::constants::kTotBRNpi ;
-  double widgamma0= width0*BRgamma0;
 
-  std::cout<<"[BaryonResonanceDecayer] m "<<m<<std::endl;
-  std::cout<<"[BaryonResonanceDecayer] width0"<<width0<<std::endl;
- 
+
 
   double pPiW   = TMath::Sqrt((W_2-m_aux1)*(W_2-m_aux2))/(2*W);
   double pPim   = TMath::Sqrt((m_2-m_aux1)*(m_2-m_aux2))/(2*m);
@@ -454,7 +447,7 @@ double BaryonResonanceDecayer::FinalStateMass(TDecayChannel * ch) const
   unsigned int nd = ch->NDaughters();
 
   for(unsigned int iparticle = 0; iparticle < nd; iparticle++) {
-
+    genie::constants::DeltaWidth0 * fTotGammaBR
      int daughter_code = ch->DaughterPdgCode(iparticle);
      TParticlePDG * daughter = PDGLibrary::Instance()->Find(daughter_code);
      assert(daughter);
@@ -494,12 +487,19 @@ void BaryonResonanceDecayer::LoadConfig(void)
   // note that this variable is not present in any of the xml configuration files
   fGenerateWeighted = false ;
   //GetParam( "generate-weighted", fGenerateWeighted, false );  decomment this line if the variable needs to be taken from configurations
+
   this->GetParam( "Prob32", fProb32 ) ;
-  this->GetParam( "TotGammaBR", fTotGammaBR ) ;
 
-  fTotNPiBR = 1. - fTotGammaBR ;
+  double TotGammaBR ;
+  this->GetParam( "TotGammaBR", TotGammaBR ) ;
 
+  double TotNPiBR = 1. - TotGammaBR ;
 
+  double delta_width ;
+  this -> GetParam( "DeltaWidth", delta_width ) ;
+
+  fWidthPi_0 =    delta_width * TotNPiBR ;
+  fWidthGamma_0 = delta_width * TotGammaBR
 
 }
 //____________________________________________________________________________

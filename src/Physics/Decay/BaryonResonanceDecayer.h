@@ -62,9 +62,9 @@ private:
   double         FinalStateMass (TDecayChannel * channel) const;
 
   double         fProb32;
-  double         fTotGammaBR ;
-  double         fTotNPiBR ;
 
+  double   fWidthPi_0 ;
+  double   fWidthGamma_0 ;
 
   mutable TGenPhaseSpace fPhaseSpaceGenerator;
   mutable double         fWeight;
