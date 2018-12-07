@@ -60,7 +60,12 @@ private:
   void           LoadConfig     (void);
   TClonesArray * DecayExclusive (int pdgc, TLorentzVector & p, TDecayChannel * ch) const;
   double         FinalStateMass (TDecayChannel * channel) const;
+
   double         fProb32;
+  double         fTotGammaBR ;
+  double         fTotNPiBR ;
+
+
   mutable TGenPhaseSpace fPhaseSpaceGenerator;
   mutable double         fWeight;
 

@@ -111,13 +111,10 @@ double BaryonResonanceDecayer::BRDeltaNGammaNPi(int id_mother, int ichannel, dou
   // double rDelta= 0.81*FMTOGEV;
 
 
-
-
-  double BRPi0    = genie::constants::totBRNpi;
   double BRPi01   = genie::constants::BRNpi1;
   double BRPi02   = genie::constants::BRNpi2;
   double BRgamma0 = genie::constants::totBRNgamma;
-  double widPi0   = width0*BRPi0;
+  double widPi0   = width0 * genie::constants::kTotBRNpi ;
   double widgamma0= width0*BRgamma0;
 
   std::cout<<"[BaryonResonanceDecayer] m "<<m<<std::endl;
@@ -498,6 +495,10 @@ void BaryonResonanceDecayer::LoadConfig(void)
   fGenerateWeighted = false ;
   //GetParam( "generate-weighted", fGenerateWeighted, false );  decomment this line if the variable needs to be taken from configurations
   this->GetParam( "Prob32", fProb32 ) ;
+  this->GetParam( "TotGammaBR", fTotGammaBR ) ;
+
+  fTotNPiBR = 1. - fTotGammaBR ;
+
 
 
 }

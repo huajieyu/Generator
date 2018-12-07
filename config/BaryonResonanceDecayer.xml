@@ -2,9 +2,26 @@
 
 <alg_conf>
 
-  Configuration sets for Baryon Resonance decayer
+<!-- 
+
+Configuration sets for Baryon Resonance decayer
+
+Configurable Parameters:
+..........................................................................................................
+Name                          Type     Optional   Comment                     Default
+..........................................................................................................
+Prob32                        double   No                                     
+TotGammaBR                    double   No         BR of Delta -> N photons   
+
+
+--> 
+
 
   <param_set name="Default"> 
+
+       <param type="double" name="Prob32">     0.75   </param> 
+       <param type="double" name="TotGammaBR"> 0.006  </param> 
+
   </param_set>
 
 </alg_conf>
