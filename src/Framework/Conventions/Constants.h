@@ -103,10 +103,10 @@ static const double kNucDensity = 2.3E+17 * units::kg/units::m3; // Nuclear dens
 
 //FMTOGEV
 static const double FMTOGEV= 5.0761421;
-double totBRNpi=0.994;
-double BRNpi1=0.667002;
-double BRNpi2=0.332998;
-double totBRNgamma=0.004;
+static const double totBRNpi=0.994;
+static const double BRNpi1=0.667002;
+static const double BRNpi2=0.332998;
+static const double totBRNgamma=0.006;
 
 //
 // Earth consts
