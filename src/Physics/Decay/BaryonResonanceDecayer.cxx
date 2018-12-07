@@ -251,8 +251,9 @@ TClonesArray * BaryonResonanceDecayer::DecayExclusive(
   double mass[nd];
 
   bool DeltaNpidecay=false;      // flag of expected channel Delta->pion+nucleon
-  int  npi=0;
-  int  nnucl=0;
+  int  npi=0,  nnucl=0;
+  unsigned int pi_id = 0;
+
   //the propability of decaying into three body is very small, simulated in GENIE? 
   for(unsigned int iparticle = 0; iparticle < nd; iparticle++) {
 
@@ -263,77 +264,71 @@ TClonesArray * BaryonResonanceDecayer::DecayExclusive(
      pdgc[iparticle] = daughter_code;
      mass[iparticle] = daughter->Mass();
 
-	 if(nd==2 && (pdg_code==2224 || pdg_code==2214 || pdg_code==2114) ){
-	    if(pdgc[iparticle]==211 || pdgc[iparticle]==111 ||pdgc[iparticle]==-211){ npi=npi+1;}
-	    else if(pdgc[iparticle]==2112 || pdgc[iparticle]==2212){nnucl=nnucl+1;}
-		
-		if(npi==1 && nnucl==1){DeltaNpidecay=true;}
-	 }
+     if ( daughter_code == 211 || daughter_code == 111 || daughter_code == -211 ) {
+       ++npi ;
+       pi_id = iparticle ;
+     }
+     if ( daughter_code == 2112 || daughter_code == 2212 ) {
+       ++nnucl ;
+     }
 
      SLOG("Decay", pINFO)
        << "+ daughter[" << iparticle << "]: "
         << daughter->GetName() << " (pdg-code = "
           << pdgc[iparticle] << ", mass = " << mass[iparticle] << ")";
-  }
+  }  // loop over the duaghter particles
 
+  if( nd==2 && (pdg_code==2224 || pdg_code==2214 || pdg_code==2114) ) {
+    if( npi==1 && nnucl==1 ){
+      DeltaNpidecay=true;
+    }
+  }
 
   bool is_permitted = fPhaseSpaceGenerator.SetDecay(p, nd, mass);
   assert(is_permitted);
 
-  // Customized part--define variables for the Wtheta selection---------------
-  double aidrnd=0;
-  double wthetacheck=0;
-  double p32check=fProb32;
-  double p12check=1-p32check;
-  double p2costhetacheck=0;
-  double costhetacheck=0;
 
-  TLorentzVector vpioncheck;
-  TLorentzVector vcheckdelta;
-
-  std::cout<<"[BaryonResonanceDecayer] fProb32 "<<fProb32<<std::endl;
- 
   //-- Create the event record
-  //TClonesArray * particle_list = new TClonesArray("TMCParticle", 1+nd);
-  TClonesArray * particle_list = 0;
-  TClonesArray * temp_particle_list = new TClonesArray("TMCParticle", 1+nd);//A temprary record.
+   TClonesArray * particle_list = new TClonesArray("TMCParticle", 1+nd) ;
 
+   //-- Add the mother particle to the event record (KS=11 as in PYTHIA)
+   TParticlePDG * mother = PDGLibrary::Instance()->Find(pdg_code);
 
-  //while(1){  //start a loop until break;
+   new ( (*particle_list)[0] )
+        TMCParticle( 11,pdg_code,
+                     0,0,0,
+                     p.Px(), p.Py(), p.Pz(), p.Energy(), mother -> Mass(),
+                     0,0,0,0,0 ) ;
 
-  //double wmax = fPhaseSpaceGenerator.GetWtMax();
-  double wmax = -1;
-  for(int i=0; i<50; i++) {
-     double w = fPhaseSpaceGenerator.Generate();
+  double wmax = -1, w ;
+  for( int i=0; i<50; i++ ) {
+     w = fPhaseSpaceGenerator.Generate();
      wmax = TMath::Max(wmax,w);
   }
   assert(wmax>0);
   LOG("Decay", pINFO)
      << "Max phase space gen. weight for current decay: " << wmax;
 
-  if(fGenerateWeighted)
-  {
+  if ( fGenerateWeighted )  {
      // *** generating weighted decays ***
-     double w = fPhaseSpaceGenerator.Generate();
+     w = fPhaseSpaceGenerator.Generate();
      fWeight *= TMath::Max(w/wmax, 1.);
   }
-  else
-  {
+  else  {
      // *** generating un-weighted decays ***
      RandomGen * rnd = RandomGen::Instance();
      wmax *= 2;
      bool accept_decay=false;
      unsigned int itry=0;
 
-     while(!accept_decay)
-     {
+     while(!accept_decay) {
        itry++;
        assert(itry<kMaxUnweightDecayIterations);
 
-       double w  = fPhaseSpaceGenerator.Generate();
+       w  = fPhaseSpaceGenerator.Generate();
        double gw = wmax * rnd->RndDec().Rndm();
 
-       if(w>wmax) {
+       if( w > wmax ) {
           LOG("Decay", pWARN) 
              << "Current decay weight = " << w << " > wmax = " << wmax;
        }
@@ -341,66 +336,52 @@ TClonesArray * BaryonResonanceDecayer::DecayExclusive(
           << "Current decay weight = " << w << " / R = " << gw;
 
        accept_decay = (gw<=w);
-     }
-  }
+
+       if ( accept_decay && DeltaNpidecay ) {
+         // in this case we need additional checks based on the kinamatics of the pion and of the nucleon
+
+         TLorentzVector * temp ;
+
+         // retrieve the pion
+         temp = fPhaseSpaceGenerator.GetDecay(pi_id);
+         TLorentzVector pion( temp -> Px(), temp -> Py(), temp -> Pz(), temp -> Energy() ) ;
+
+         pion.Boost(-p.BoostVector() );
+
+         double costhetacheck = pion.CosTheta() ;
+         double p2costhetacheck = 0.5*(3.*costhetacheck*costhetacheck-1.);
+
+         double wthetacheck = 1. - fProb32 * (p2costhetacheck)+fProb12*(p2costhetacheck);
+
+         double aidrnd = 1.25 * rnd->RndDec().Rndm();
+
+         if ( wthetacheck < aidrnd )
+           accept_decay = false ;
+
+       }  // It is a Delta -> N Pi decay
+
+     }  // loop over possible decays
+
+  } // not weighted generation
 
 
+  // we fill the event record as it's coming from the phase space decayer
 
-  //-- Add the mother particle to the event record (KS=11 as in PYTHIA)
-  TParticlePDG * mother = PDGLibrary::Instance()->Find(pdg_code);
-
-  while(1) {
-  double px   = p.Px();
-  double py   = p.Py();
-  double pz   = p.Pz();
-  double E    = p.Energy();
-  double M    = mother->Mass();
-
-  if(DeltaNpidecay){vcheckdelta.SetPxPyPzE(px,py,pz,E);}  // restore mother particle's 4-momentum.
-
-  new ( (*temp_particle_list)[0] )
-                    TMCParticle(11,pdg_code,0,0,0,px,py,pz,E,M,0,0,0,0,0); //restore mother particle to the temp_particle list.
-
-  //-- Add the daughter particles to the event record
   for(unsigned int id = 0; id < nd; id++) {
 
-       TLorentzVector * p4 = fPhaseSpaceGenerator.GetDecay(id);
-       LOG("Decay", pDEBUG)
-               << "Adding final state particle PDGC = " << pdgc[id]
-                                   << " with mass = " << mass[id] << " GeV";
-       px   = p4->Px();
-       py   = p4->Py();
-       pz   = p4->Pz();
-       E    = p4->Energy();
-       M    = mass[id];
+    TLorentzVector * p4 = fPhaseSpaceGenerator.GetDecay(id);
 
-	   if(DeltaNpidecay){
-                   
-		   if(pdgc[id]==211 || pdgc[id]==111 ||pdgc[id]==-211){
-                        
-			       vpioncheck.SetPxPyPzE(px,py,pz,E);
-			       //Boost pion 4-vec from lab frame into CM frame
-                   vpioncheck.Boost(-vcheckdelta.BoostVector());
-                   //-----------------------------------------------------------------
-		           costhetacheck=vpioncheck.Pz()/sqrt(vpioncheck.Px()*vpioncheck.Px()+vpioncheck.Py()*vpioncheck.Py()
-                                 +vpioncheck.Pz()*vpioncheck.Pz());
-                   p2costhetacheck=0.5*(3*costhetacheck*costhetacheck-1);
-                   wthetacheck=1-p32check*(p2costhetacheck)+p12check*(p2costhetacheck);  
-                   aidrnd=1.25*gRandom->Rndm();
-                                         
-		   }  //end pion-selection                   
-	   }  //end DeltaNpidecay
+    LOG("Decay", pDEBUG)
+    << "Adding final state particle PDGC = " << pdgc[id]
+                                                     << " with mass = " << mass[id] << " GeV";
+    new ( (*particle_list)[1+id] )
+              TMCParticle(1,pdgc[id],
+                          0,0,0,
+                          p4 -> Px(), p4 -> Py(), p4 -> Pz(), p4 -> Energy(), mass[id],
+                          0,0,0,0,0 ) ;
 
-       new ( (*temp_particle_list)[1+id] )
-                         TMCParticle(1,pdgc[id],0,0,0,px,py,pz,E,M,0,0,0,0,0);
-  }//end daughter particle loop
+  } //end daughter particle loop
 
-  if(!DeltaNpidecay) break;
-  if(DeltaNpidecay && wthetacheck>=aidrnd) break;
-
-  }//end while(1)
-
-  particle_list=temp_particle_list;
   //-- Set owner and return
   particle_list->SetOwner(true);
   return particle_list;
@@ -435,21 +416,21 @@ double BaryonResonanceDecayer::FinalStateMass(TDecayChannel * ch) const
   unsigned int nd = ch->NDaughters();
 
   for(unsigned int iparticle = 0; iparticle < nd; iparticle++) {
-    genie::constants::DeltaWidth0 * fTotGammaBR
-     int daughter_code = ch->DaughterPdgCode(iparticle);
-     TParticlePDG * daughter = PDGLibrary::Instance()->Find(daughter_code);
-     assert(daughter);
 
-     double md = daughter->Mass();
+    int daughter_code = ch->DaughterPdgCode(iparticle);
+    TParticlePDG * daughter = PDGLibrary::Instance()->Find(daughter_code);
+    assert(daughter);
 
-     // hack to switch off channels giving rare  occurences of |1114| that has 
-     // no decay channels in the pdg table (08/2007)
-     if(TMath::Abs(daughter_code) == 1114) {
-         LOG("Decay", pNOTICE)
-                  << "Disabling decay channel containing resonance 1114";;
-         md = 999999999;
-     }
-     mass += md;
+    double md = daughter->Mass();
+
+    // hack to switch off channels giving rare  occurences of |1114| that has
+    // no decay channels in the pdg table (08/2007)
+    if(TMath::Abs(daughter_code) == 1114) {
+      LOG("Decay", pNOTICE)
+                      << "Disabling decay channel containing resonance 1114";;
+      md = 999999999;
+    }
+    mass += md;
   }  
   return mass;
 }
@@ -477,6 +458,7 @@ void BaryonResonanceDecayer::LoadConfig(void)
   //GetParam( "generate-weighted", fGenerateWeighted, false );  decomment this line if the variable needs to be taken from configurations
 
   this->GetParam( "Prob32", fProb32 ) ;
+  fProb12 = 1. - fProb32 ;
 
   double delta_width ;
   this -> GetParam( "DeltaWidth", delta_width ) ;
@@ -489,7 +471,7 @@ void BaryonResonanceDecayer::LoadConfig(void)
   double TotNPiBR = 1. - TotGammaBR ;
 
   fWidthPi_0 =    delta_width * TotNPiBR ;
-  fWidthGamma_0 = delta_width * TotGammaBR
+  fWidthGamma_0 = delta_width * TotGammaBR ;
 
   this -> GetParam( "OnePiBR", fBRPi01 ) ;
   fBRPi02 = 1. - fBRPi01 ;

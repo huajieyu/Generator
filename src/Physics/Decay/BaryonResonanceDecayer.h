@@ -61,8 +61,6 @@ private:
   TClonesArray * DecayExclusive (int pdgc, TLorentzVector & p, TDecayChannel * ch) const;
   double         FinalStateMass (TDecayChannel * channel) const;
 
-  double         fProb32;
-
   double   fWidthPi_0 ;
   double   fWidthGamma_0 ;
 
@@ -75,6 +73,8 @@ private:
   double   fDeltaMass2 ;
   double   fNucleonMass2 ;
   double   fMAux1, fMAux2 ;
+
+  double   fProb32, fProb12 ;
 
   mutable TGenPhaseSpace fPhaseSpaceGenerator;
   mutable double         fWeight;
