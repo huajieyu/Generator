@@ -77,70 +77,58 @@ double BaryonResonanceDecayer::BRDeltaNGammaNPi(int id_mother, int ichannel, dou
   //-- auxiliary parameters
   int DeltaFlag = 0;
   if (id_mother == 2114 || id_mother==-2114) {
-	  DeltaFlag = 1; // Delta0 or Delta0_bar
+    DeltaFlag = 1; // Delta0 or Delta0_bar
   }  
   else if (id_mother == 2214 || id_mother==-2214) {
-      DeltaFlag = 2; // Delta+ or anti_Delta+
+    DeltaFlag = 2; // Delta+ or anti_Delta+
   }  
   else  {
-  return 0; 
+    return 0;
   }
-  double mN  =   genie::constants::kNucleonMass;
-  double mPi  = genie::constants::kPi0Mass;
 
-  if (W<=mN+mPi) {
-	  if (ichannel == 0) {return 0;} // ichannel =0,1,2 has to match 
-	                                // the channel order in genie_pdg_table.dat
-	  if (ichannel == 1) {return 0;}
-	  if (ichannel == 2) {return 1;}
+  if( W <= genie::constants::kNucleonMass + genie::constants::kPi0Mass ) {
+    if (ichannel == 0) {return 0;} // ichannel =0,1,2 has to match
+    // the channel order in genie_pdg_table.dat
+    if (ichannel == 1) {return 0;}
+    if (ichannel == 2) {return 1;}
   } else {
 
-  //double m  = 1.232;
-  //double m = utils::res::Mass              (resonance); 
-  double m = genie::constants::DeltaMass0;
-
-  //double width0= 0.12;
-  //double width0= utils::res::Width             (resonance);
- 
-  double m_2   = TMath::Power(m, 2);
-  double mN_2  = TMath::Power(mN,   2);
-  double W_2   = TMath::Power(W,    2);
-  double m_aux1= TMath::Power(mN+mPi, 2);
-  double m_aux2= TMath::Power(mN-mPi, 2);
   // double rDelta= 0.81*FMTOGEV;
 
-  double BRPi01   = genie::constants::BRNpi1;
-  double BRPi02   = genie::constants::BRNpi2;
+    double W_2   = TMath::Power(W,    2);
 
+    double pPiW   = TMath::Sqrt( (W_2 - fMAux1) * (W_2 - fMAux2) )/(2*W);
+    double pPim   = TMath::Sqrt( ( fDeltaMass2- fMAux1 )*(fDeltaMass2- fMAux2) )/( 2 * fDeltaMass );
 
+    double EgammaW = (W_2-fNucleonMass2)/(2*W);
+    double Egammam = (fDeltaMass2-fNucleonMass2)/(2*fDeltaMass);
 
-  double pPiW   = TMath::Sqrt((W_2-m_aux1)*(W_2-m_aux2))/(2*W);
-  double pPim   = TMath::Sqrt((m_2-m_aux1)*(m_2-m_aux2))/(2*m);
-  double EgammaW= (W_2-mN_2)/(2*W);
-  double Egammam= (m_2-mN_2)/(2*m);
-  double TPiW=TMath::Power(pPiW, 3);  
-  double TPim=TMath::Power(pPim, 3);
-  double fgammaW= 1/(TMath::Power(1+EgammaW*EgammaW/0.706, 2));
-  double fgammam= 1/(TMath::Power(1+Egammam*Egammam/0.706, 2));
+    double TPiW=TMath::Power(pPiW, 3);
+    double TPim=TMath::Power(pPim, 3);
 
+    double fgammaW= 1./(TMath::Power(1+EgammaW*EgammaW/fFFScaling, 2));
+    double fgammam= 1./(TMath::Power(1+Egammam*Egammam/fFFScaling, 2));
 
-  double Rinverse = widPi0*TMath::Power(Egammam, 3)*TMath::Power(fgammam, 2)*TPiW
-	     /(widgamma0*TMath::Power(EgammaW, 3)*TMath::Power(fgammaW, 2)*TPim);
-  double BRPi = Rinverse/(1+Rinverse);
-  double BRgamma = 1/(1+Rinverse);
+    double Rinverse = fWidthPi_0 * TMath::Power(Egammam, 3)*TMath::Power(fgammam, 2)*TPiW
+                         /(fWidthGamma_0*TMath::Power(EgammaW, 3)*TMath::Power(fgammaW, 2)*TPim);
+
+    double BRPi = Rinverse/(1+Rinverse);
+    double BRgamma = 1/(1+Rinverse);
   
-  if (DeltaFlag==1) {
-  	  if (ichannel == 0) {return BRPi*BRPi02;}
-	  if (ichannel == 1) {return BRPi*BRPi01;}
-	  if (ichannel == 2) {return BRgamma;}
+    if (DeltaFlag==1) {
+      if (ichannel == 0) {return BRPi * fBRPi02 ;}
+      if (ichannel == 1) {return BRPi * fBRPi01 ;}
+      if (ichannel == 2) {return BRgamma;}
+    }
+    if (DeltaFlag==2) {
+      if (ichannel == 0) {return BRPi * fBRPi01 ;}
+      if (ichannel == 1) {return BRPi * fBRPi02 ;}
+      if (ichannel == 2) {return BRgamma;}
+    }
   }
-  if (DeltaFlag==2) {
-  	  if (ichannel == 0) {return BRPi*BRPi01;}
-	  if (ichannel == 1) {return BRPi*BRPi02;}
-	  if (ichannel == 2) {return BRgamma;}
-  }
-  }
- return 0;
+
+  return 0;
+
 }
 //-----------------------------------------------
 TClonesArray* BaryonResonanceDecayer::Decay(const DecayerInputs_t & inp) const
@@ -490,16 +478,29 @@ void BaryonResonanceDecayer::LoadConfig(void)
 
   this->GetParam( "Prob32", fProb32 ) ;
 
+  double delta_width ;
+  this -> GetParam( "DeltaWidth", delta_width ) ;
+
+  this -> GetParam( "DeltaMass", fDeltaMass ) ;
+
   double TotGammaBR ;
   this->GetParam( "TotGammaBR", TotGammaBR ) ;
 
   double TotNPiBR = 1. - TotGammaBR ;
 
-  double delta_width ;
-  this -> GetParam( "DeltaWidth", delta_width ) ;
-
   fWidthPi_0 =    delta_width * TotNPiBR ;
   fWidthGamma_0 = delta_width * TotGammaBR
+
+  this -> GetParam( "OnePiBR", fBRPi01 ) ;
+  fBRPi02 = 1. - fBRPi01 ;
+
+  fDeltaMass2   = TMath::Power( fDeltaMass, 2) ;
+  fNucleonMass2 = TMath::Power( genie::constants::kNucleonMass, 2) ;
+  fMAux1 = TMath::Power( genie::constants::kNucleonMass + genie::constants::kPi0Mass , 2) ;
+  fMAux2 = TMath::Power( genie::constants::kNucleonMass - genie::constants::kPi0Mass , 2) ;
+
+  this -> GetParam( "FFScaling", fFFScaling ) ;
+
 
 }
 //____________________________________________________________________________

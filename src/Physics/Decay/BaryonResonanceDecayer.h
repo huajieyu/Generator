@@ -66,6 +66,16 @@ private:
   double   fWidthPi_0 ;
   double   fWidthGamma_0 ;
 
+  double   fBRPi01 ;
+  double   fBRPi02 ;
+
+  double   fFFScaling ;
+
+  double   fDeltaMass ;
+  double   fDeltaMass2 ;
+  double   fNucleonMass2 ;
+  double   fMAux1, fMAux2 ;
+
   mutable TGenPhaseSpace fPhaseSpaceGenerator;
   mutable double         fWeight;
 
