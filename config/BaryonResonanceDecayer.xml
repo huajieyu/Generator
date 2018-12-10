@@ -2,9 +2,39 @@
 
 <alg_conf>
 
-  Configuration sets for Baryon Resonance decayer
+<!-- 
+
+Configuration sets for Baryon Resonance decayer
+
+Configurable Parameters:
+..........................................................................................................
+Name                          Type     Optional   Comment                                                 Default
+..........................................................................................................
+DeltaWidth                    double   No         Delta width, Unit: GeV 
+DeltaMass                     double   No         Delta mass , Unit: GeV
+TotGammaBR                    double   No         BR of Delta -> N photons (before scaling)   
+OnePiBR                       double   No         fraction of BR of Delta in N  pion that goes into 1 pion 
+FFScaling                     double   No         Scaling factor for Form Factor for Gamma Delta coupling
+                                                  This value is coming from an MiniBooNE technical note
+Prob32                        double   No                                  
+
+--> 
+
 
   <param_set name="Default"> 
+
+    <param type="double" name="DeltaWidth">  0.12   </param> 
+    <param type="double" name="DeltaMass">   1.232  </param> 
+
+    <param type="double" name="TotGammaBR"> 0.006    </param> 
+    <param type="double" name="OnePiBR">   0.667002  </param> 
+
+    <param type="double" name="FFScaling">  0.706   </param> 
+
+
+    <param type="double" name="Prob32">     0.75   </param> 
+   
+
   </param_set>
 
 </alg_conf>
