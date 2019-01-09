@@ -90,6 +90,12 @@ UnstableParticleDecayer::~UnstableParticleDecayer()
 //___________________________________________________________________________
 void UnstableParticleDecayer::ProcessEventRecord(GHepRecord * evrec) const
 {
+
+  Interaction * interaction = evrec->Summary();
+  double Q2=interaction->Kine().Q2(true);
+  TLorentzVector  pp4l=interaction->KinePtr()->FSLeptonP4();
+
+
 // Loop over particles, find unstable ones and decay them
 
   TObjArrayIter piter(evrec);
@@ -139,6 +145,10 @@ void UnstableParticleDecayer::ProcessEventRecord(GHepRecord * evrec) const
         DecayerInputs_t dinp;
         dinp.PdgCode = p->Pdg();
         dinp.P4      = &p4;
+
+        dinp.Qsqr    = Q2;
+        dinp.P4l     = &pp4l;
+        dinp.P4v     = evrec->Probe()->GetP4();
 
         TClonesArray * decay_products = fCurrDecayer->Decay(dinp);
 

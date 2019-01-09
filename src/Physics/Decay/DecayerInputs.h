@@ -35,13 +35,20 @@ public:
   int                    PdgCode; ///< pdg code
   const TLorentzVector * P4;      ///< 4-momentum
   const TVector3 *       Polz;    ///< polarization
+  double                 Qsqr;
+  const TLorentzVector * P4l;
+  const TLorentzVector * P4v;
 
 private:
 
   void Init(void) {
     PdgCode = 0;
     P4      = 0;
-    Polz    = 0; 
+    Polz    = 0;
+    Qsqr    = 0.;
+    P4l     = 0;
+    P4v     = 0;
+ 
   }
 
 };

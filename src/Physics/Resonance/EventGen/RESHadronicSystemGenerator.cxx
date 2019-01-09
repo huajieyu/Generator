@@ -91,7 +91,7 @@ void RESHadronicSystemGenerator::ProcessEventRecord(GHepRecord * evrec) const
 //___________________________________________________________________________
 int RESHadronicSystemGenerator::GetResonancePdgCode(GHepRecord * evrec) const
 {
-// In the RES thread the resonance is specifed when selecting interaction
+// In the RES thread the resonance is specifed when selecting interaction 
 // This method adds it to the GHEP record.
 
   Interaction * interaction = evrec->Summary();
@@ -140,6 +140,11 @@ void RESHadronicSystemGenerator::AddResonanceDecayProducts(
 // resonance's kinematically available(the RES is not on the mass shell)decay
 // channels
 
+//Libo
+  Interaction * interaction = evrec->Summary();
+  double Q2=interaction->Kine().Q2(true);
+  TLorentzVector  pp4l=interaction->KinePtr()->FSLeptonP4();
+//-----------------------------------------------
   // find the resonance position
   int irpos = evrec->ParticlePosition(pdgc, kIStPreDecayResonantState, 0);
   assert(irpos>0);
@@ -155,6 +160,10 @@ void RESHadronicSystemGenerator::AddResonanceDecayProducts(
   DecayerInputs_t dinp;
   dinp.PdgCode = pdgc;
   dinp.P4      = resonance->P4();
+  
+  dinp.Qsqr    = Q2;
+  dinp.P4l     = & pp4l;
+  dinp.P4v     = evrec->Probe()->GetP4();
 
   // do the decay
   TClonesArray * decay_products = fResonanceDecayer->Decay(dinp);

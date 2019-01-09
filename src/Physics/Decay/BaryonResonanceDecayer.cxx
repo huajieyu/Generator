@@ -233,7 +233,12 @@ TClonesArray* BaryonResonanceDecayer::Decay(const DecayerInputs_t & inp) const
 
   //-- Decay the exclusive state and return the particle list
   TLorentzVector p4(*inp.P4);
-  return ( this->DecayExclusive(inp.PdgCode, p4, ch) );
+
+  double Q2=inp.Qsqr;
+  TLorentzVector p4v(*inp.P4v);
+  TLorentzVector p4l(*inp.P4l);
+
+  return ( this->DecayExclusive(inp.PdgCode, p4, ch, Q2, p4v, p4l) );
 }
 //____________________________________________________________________________
 void BaryonResonanceDecayer::Initialize(void) const
@@ -242,7 +247,7 @@ void BaryonResonanceDecayer::Initialize(void) const
 }
 //____________________________________________________________________________
 TClonesArray * BaryonResonanceDecayer::DecayExclusive(
-     int pdg_code, TLorentzVector & p, TDecayChannel * ch) const
+     int pdg_code, TLorentzVector & p, TDecayChannel * ch,double Q2, TLorentzVector p4v, TLorentzVector p4l) const
 {
   //-- Get the final state mass spectrum and the particle codes
   unsigned int nd = ch->NDaughters();
@@ -286,6 +291,129 @@ TClonesArray * BaryonResonanceDecayer::DecayExclusive(
 
   bool is_permitted = fPhaseSpaceGenerator.SetDecay(p, nd, mass);
   assert(is_permitted);
+
+  // ANL OR BNL ANGULAR DISTRIBUTION(source comes from NuWRO)-----------------------------------------------------
+  double r33,r31,r3m1;
+  double ct,cphi,weight;
+  double maxwei=1.;
+  
+  switch(fANLORBNL)
+  {
+     //No correlations
+     case 0:
+     {
+          r33=0.5;
+          r31=0.;
+          r3m1=0.;
+          maxwei=1.;
+          break;
+     }
+
+     //ANL
+     case 1:
+     {
+       if(Q2<0.1)
+       {
+          r33=0.523;
+          r31=-0.322;
+          r3m1=-0.138;
+          maxwei=1.+(r33-0.5)-2.*sqrt(3.)*r31-sqrt(3.)*r3m1;
+
+          break;
+       } 
+       else if(Q2<0.3)
+       {
+          r33=0.649;
+          r31=-0.128;
+          r3m1=0.034;
+          maxwei=1.+(r33-0.5)-2.*sqrt(3.)*r31+sqrt(3.)*r3m1;
+
+          break;
+       } 
+       else if(Q2<0.5)
+       {
+          r33=0.674;
+          r31=-0.017;
+          r3m1=-0.203;
+          maxwei=1.+(r33-0.5)-2.*sqrt(3.)*r31-sqrt(3.)*r3m1;
+
+          break;
+       } 
+       else
+       {
+          r33=0.748;
+          r31=0.041;
+          r3m1=-0.162;
+          maxwei=1.+(r33-0.5)+2.*sqrt(3.)*r31-sqrt(3.)*r3m1;
+
+          break;
+       } 
+     }   
+
+     //BNL
+     case 2:
+     {
+       if(Q2<0.2)
+       {
+          r33=0.661;
+          r31=-0.213;
+          r3m1=-0.133;
+          maxwei=1.+(r33-0.5)-2.*sqrt(3.)*r31-sqrt(3.)*r3m1;
+
+          break;
+       } 
+       else if(Q2<0.4)
+       {
+          r33=0.673;
+          r31=0.025;
+          r3m1=-0.075;
+          maxwei=1.+(r33-0.5)+2.*sqrt(3.)*r31-sqrt(3.)*r3m1;
+
+          break;
+       } 
+       else if(Q2<0.6)
+       {
+          r33=0.750;
+          r31=0.036;
+          r3m1=0.046;
+          maxwei=1.+(r33-0.5)+2.*sqrt(3.)*r31+sqrt(3.)*r3m1;
+
+          break;
+       } 
+       else
+       {
+          r33=0.800;
+          r31=0.075;
+          r3m1=0.004;
+          maxwei=1.+(r33-0.5)+2.*sqrt(3.)*r31+sqrt(3.)*r3m1;
+
+          break;
+       } 
+     }   
+     //Theta only
+     case 3:
+     {
+         r33=0.75;
+         r31=0.;
+         r3m1=0.;
+         maxwei=1.25;
+
+         break;
+     }
+     //No correlations
+     default:
+     {
+          r33=0.5;
+          r31=0.;
+          r3m1=0.;
+          maxwei=1.;
+
+          break;
+     }
+
+  }
+
+  TLorentzVector q=p4v-p4l;
 
 
   //-- Create the event record
@@ -345,17 +473,36 @@ TClonesArray * BaryonResonanceDecayer::DecayExclusive(
          // retrieve the pion
          temp = fPhaseSpaceGenerator.GetDecay(pi_id);
          TLorentzVector pion( temp -> Px(), temp -> Py(), temp -> Pz(), temp -> Energy() ) ;
-
+ 
          pion.Boost(-p.BoostVector() );
+          p4v.Boost(-p.BoostVector() );
+          p4l.Boost(-p.BoostVector() );
+            q.Boost(-p.BoostVector() );
 
-         double costhetacheck = pion.CosTheta() ;
-         double p2costhetacheck = 0.5*(3.*costhetacheck*costhetacheck-1.);
+         TVector3 p3v(p4v.Px(),p4v.Py(),p4v.Pz());
+         TVector3 p3l(p4l.Px(),p4l.Py(),p4l.Pz()); 
+         TVector3 mtr(q.Px(),q.Py(),q.Pz()); 
 
-         double wthetacheck = 1. - fProb32 * (p2costhetacheck)+fProb12*(p2costhetacheck);
+         TVector3 zaxis=1./sqrt(mtr.X()*mtr.X()+mtr.Y()*mtr.Y()+mtr.Z()*mtr.Z())*mtr;
+ 
+         //TVector3 zaxis=mtr/sqrt(mtr.X()*mtr.X()+mtr.Y()*mtr.Y()+mtr.Z()*mtr.Z());
+         TVector3 yaxis=p3v.Cross(p3l);
+                  yaxis=1./sqrt(yaxis.X()*yaxis.X()+yaxis.Y()*yaxis.Y()+yaxis.Z()*yaxis.Z())*yaxis;
+         //           yaxis=yaxis/sqrt(yaxis.X()*yaxis.X()+yaxis.Y()*yaxis.Y()+yaxis.Z()*yaxis.Z());
+         TVector3 xaxis=yaxis.Cross(zaxis);
 
-         double aidrnd = 1.25 * rnd->RndDec().Rndm();
+         //-----------------------------------------------------------------
+         TVector3 pion3m(pion.Px(),pion.Py(),pion.Pz());
+         TVector3 pion_dir=1./sqrt(pion.Px()*pion.Px()+pion.Py()*pion.Py()
+                           +pion.Pz()*pion.Pz())*pion3m;
 
-         if ( wthetacheck < aidrnd )
+         ct=pion_dir*zaxis;
+         cphi=pion_dir*xaxis;
+
+         weight=(1.- (r33-0.5)*(3.*ct*ct-1.)-sqrt(3.0)*( 2.*r31*sqrt(1.-ct*ct)*ct*cphi + r3m1*(1.-ct*ct)*(2.*cphi*cphi-1.) ));
+         double aidrnd=maxwei*gRandom->Rndm();
+
+         if ( weight < aidrnd )
            accept_decay = false ;
 
        }  // It is a Delta -> N Pi decay
@@ -482,6 +629,8 @@ void BaryonResonanceDecayer::LoadConfig(void)
   fMAux2 = TMath::Power( genie::constants::kNucleonMass - genie::constants::kPi0Mass , 2) ;
 
   this -> GetParam( "FFScaling", fFFScaling ) ;
+
+  this -> GetParam("ANLORBNL", fANLORBNL);
 
 
 }

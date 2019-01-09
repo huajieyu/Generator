@@ -33,7 +33,7 @@ Prob32                        double   No
 
 
     <param type="double" name="Prob32">     0.75   </param> 
-   
+    <param type="int" name="ANLORBNL">     1      </param>   
 
   </param_set>
 
