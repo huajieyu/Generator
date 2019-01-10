@@ -31,7 +31,32 @@ Prob32                        double   No
 
     <param type="double" name="FFScaling">  0.706   </param> 
 
-
+    <param type="double" name="ANLr33_1"> 0.523     </param>
+    <param type="double" name="ANLr31_1"> -0.322     </param>
+    <param type="double" name="ANLr3m1_1"> -0.138      </param>
+    <param type="double" name="ANLr33_2"> 0.649     </param>
+    <param type="double" name="ANLr31_2"> -0.128     </param>
+    <param type="double" name="ANLr3m1_2"> 0.034     </param>
+    <param type="double" name="ANLr33_3"> 0.674     </param>
+    <param type="double" name="ANLr31_3"> -0.017     </param>
+    <param type="double" name="ANLr3m1_3"> -0.203     </param>
+    <param type="double" name="ANLr33_4"> 0.748     </param>
+    <param type="double" name="ANLr31_4"> 0.041     </param>
+    <param type="double" name="ANLr3m1_4"> -0.162     </param>
+   
+    <param type="double" name="BNLr33_1"> 0.661     </param>
+    <param type="double" name="BNLr31_1"> -0.213     </param>
+    <param type="double" name="BNLr3m1_1"> -0.133     </param>
+    <param type="double" name="BNLr33_2"> 0.673     </param>
+    <param type="double" name="BNLr31_2"> 0.025     </param>
+    <param type="double" name="BNLr3m1_2"> -0.075     </param>
+    <param type="double" name="BNLr33_3"> 0.750     </param>
+    <param type="double" name="BNLr31_3"> 0.036     </param>
+    <param type="double" name="BNLr3m1_3"> 0.046     </param>
+    <param type="double" name="BNLr33_4"> 0.800     </param>
+    <param type="double" name="BNLr31_4"> 0.075     </param>
+    <param type="double" name="BNLr3m1_4"> 0.004     </param>
+ 
     <param type="double" name="Prob32">     0.75   </param> 
     <param type="int" name="ANLORBNL">     1      </param>   
 

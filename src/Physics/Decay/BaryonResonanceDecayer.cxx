@@ -314,36 +314,36 @@ TClonesArray * BaryonResonanceDecayer::DecayExclusive(
      {
        if(Q2<0.1)
        {
-          r33=0.523;
-          r31=-0.322;
-          r3m1=-0.138;
+          r33=fANLr33_1; //0.523;
+          r31=fANLr31_1; //-0.322;
+          r3m1=fANLr3m1_1; //-0.138;
           maxwei=1.+(r33-0.5)-2.*sqrt(3.)*r31-sqrt(3.)*r3m1;
 
           break;
        } 
        else if(Q2<0.3)
        {
-          r33=0.649;
-          r31=-0.128;
-          r3m1=0.034;
+          r33=fANLr33_2; //0.649;
+          r31=fANLr31_2; //-0.128;
+          r3m1=fANLr3m1_2; //0.034;
           maxwei=1.+(r33-0.5)-2.*sqrt(3.)*r31+sqrt(3.)*r3m1;
 
           break;
        } 
        else if(Q2<0.5)
        {
-          r33=0.674;
-          r31=-0.017;
-          r3m1=-0.203;
+          r33=fANLr33_3; //0.674;
+          r31=fANLr31_3; //-0.017;
+          r3m1=fANLr3m1; //-0.203;
           maxwei=1.+(r33-0.5)-2.*sqrt(3.)*r31-sqrt(3.)*r3m1;
 
           break;
        } 
        else
        {
-          r33=0.748;
-          r31=0.041;
-          r3m1=-0.162;
+          r33=fANLr33_4; //0.748;
+          r31=fANLr31_4; //0.041;
+          r3m1=fANLr3m1_4; //-0.162;
           maxwei=1.+(r33-0.5)+2.*sqrt(3.)*r31-sqrt(3.)*r3m1;
 
           break;
@@ -355,36 +355,36 @@ TClonesArray * BaryonResonanceDecayer::DecayExclusive(
      {
        if(Q2<0.2)
        {
-          r33=0.661;
-          r31=-0.213;
-          r3m1=-0.133;
+          r33=fBNLr33_1; //0.661;
+          r31=fBNLr31_1; //-0.213;
+          r3m1=fBNLr3m1_1; //-0.133;
           maxwei=1.+(r33-0.5)-2.*sqrt(3.)*r31-sqrt(3.)*r3m1;
 
           break;
        } 
        else if(Q2<0.4)
        {
-          r33=0.673;
-          r31=0.025;
-          r3m1=-0.075;
+          r33=fBNLr33_2; //0.673;
+          r31=fBNLr31_2; //0.025;
+          r3m1=fBNLr3m1_2; //-0.075;
           maxwei=1.+(r33-0.5)+2.*sqrt(3.)*r31-sqrt(3.)*r3m1;
 
           break;
        } 
        else if(Q2<0.6)
        {
-          r33=0.750;
-          r31=0.036;
-          r3m1=0.046;
+          r33=fBNLr33_3; //0.750;
+          r31=fBNLr31_3; //0.036;
+          r3m1=fBNLr3m1_3; //0.046;
           maxwei=1.+(r33-0.5)+2.*sqrt(3.)*r31+sqrt(3.)*r3m1;
 
           break;
        } 
        else
        {
-          r33=0.800;
-          r31=0.075;
-          r3m1=0.004;
+          r33=fBNLr33_4; //0.800;
+          r31=fBNLr31_4; //0.075;
+          r3m1=fBNLr3m1_4; //0.004;
           maxwei=1.+(r33-0.5)+2.*sqrt(3.)*r31+sqrt(3.)*r3m1;
 
           break;
@@ -393,7 +393,7 @@ TClonesArray * BaryonResonanceDecayer::DecayExclusive(
      //Theta only
      case 3:
      {
-         r33=0.75;
+         r33=fProb32;  //0.75
          r31=0.;
          r3m1=0.;
          maxwei=1.25;
@@ -603,6 +603,40 @@ void BaryonResonanceDecayer::LoadConfig(void)
   // note that this variable is not present in any of the xml configuration files
   fGenerateWeighted = false ;
   //GetParam( "generate-weighted", fGenerateWeighted, false );  decomment this line if the variable needs to be taken from configurations
+
+  this->GetParam( "ANLr33_1"; fANLr33_1);
+  this->GetParam( "ANLr31_1"; fANLr31_1);
+  this->GetParam( "ANLr3m1_1"; fANLr3m1_1);
+
+  this->GetParam( "ANLr33_2"; fANLr33_2);
+  this->GetParam( "ANLr31_2"; fANLr31_2);
+  this->GetParam( "ANLr3m1_2"; fANLr3m1_2);
+
+  this->GetParam( "ANLr33_3"; fANLr33_3);
+  this->GetParam( "ANLr31_3"; fANLr31_3);
+  this->GetParam( "ANLr3m1_3"; fANLr3m1_3);
+
+  this->GetParam( "ANLr33_4"; fANLr33_4);
+  this->GetParam( "ANLr31_4"; fANLr31_4);
+  this->GetParam( "ANLr3m1_4"; fANLr3m1_4);
+
+  this->GetParam( "BNLr33_1"; fBNLr33_1);
+  this->GetParam( "BNLr31_1"; fBNLr31_1);
+  this->GetParam( "BNLr3m1_1"; fBNLr3m1_1);
+
+  this->GetParam( "BNLr33_2"; fBNLr33_2);
+  this->GetParam( "BNLr31_2"; fBNLr31_2);
+  this->GetParam( "BNLr3m1_2"; fBNLr3m1_2);
+
+  this->GetParam( "BNLr33_3"; fBNLr33_3);
+  this->GetParam( "BNLr31_3"; fBNLr31_3);
+  this->GetParam( "BNLr3m1_3"; fBNLr3m1_3);
+
+  this->GetParam( "BNLr33_4"; fBNLr33_4);
+  this->GetParam( "BNLr31_4"; fBNLr31_4);
+  this->GetParam( "BNLr3m1_4"; fBNLr3m1_4);
+
+
 
   this->GetParam( "Prob32", fProb32 ) ;
   fProb12 = 1. - fProb32 ;
