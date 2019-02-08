@@ -183,7 +183,21 @@ static const double kSqrt18_35 =  0.71713717;
 static const double kSqrt24_35 =  0.82807867;
 static const double kSqrt27_10 =  1.6431677;
 static const double kSqrt27_40 =  0.82158384;
+//---------------------------------------------------
+//----------------------------------------------
+static const double kRhoMass = 0.7700;
+static const double kRhoMass2 = kRhoMass*kRhoMass;
+static const double FM2TOMB = 10.0;
+static const double GEVTOMB = 0.389380;
+static const double AMRHO   = 0.7700;
+static const double AMRHO2  = AMRHO*AMRHO;
+static const double R0      = 1.1052;
+static const double MBTOCM2 = 1.0E13;
+static const double GFERMI  = 1.166E-5;
+static const double GFERMI2 = GFERMI*GFERMI;
+static const double sinthetaw2 = 0.23142;
 
+//-------------------------------------------------
 } // namespace constants
 } // namespace genie
 

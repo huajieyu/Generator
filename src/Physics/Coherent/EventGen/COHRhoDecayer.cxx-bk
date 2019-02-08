@@ -1,0 +1,207 @@
+#include <TClonesArray.h>
+#include <TDecayChannel.h>
+#include <RVersion.h>
+#if ROOT_VERSION_CODE >= ROOT_VERSION(5,15,6)
+#include <TMCParticle.h>
+#else
+#include <TMCParticle6.h>
+#endif
+#include <TMath.h>
+ 
+#include "Conventions/Controls.h"
+#include "Conventions/Constants.h"
+#include "Coherent/COHRhoDecayer.h"
+#include "Messenger/Messenger.h"
+#include "PDG/PDGLibrary.h"
+#include "Numerical/RandomGen.h"
+#include "Utils/PrintUtils.h"
+
+
+using namespace genie;
+using namespace genie::controls;
+using namespace genie::constants;
+
+COHRhoDecayer::COHRhoDecayer():
+DecayModelI("genie::COHRhoDecayer")
+{
+
+}
+//----------------------------------------------------
+COHRhoDecayer::COHRhoDecayer(string config):
+DecayModelI("genie::COHRhoDecayer", config)
+{
+
+}
+//-----------------------------------------------------
+COHRhoDecayer::~COHRhoDecayer()
+{
+
+}
+//--------------------------------------------------
+bool COHRhoDecayer::IsHandled(int code) const
+{
+// handles only requests to coherent rho state
+//if(interaction->ExclTag().RhoPDG ==kPdgRhoP ||interaction->ExclTag().RhoPDG ==kPdgRhoM ) return true;
+
+//LOG("Decay", pINFO)
+//  <<"This algorithm can not decay particle with PDG code = "<<code;
+
+// return false;
+return true;
+}
+//--------------------------------------------------------------------
+TClonesArray * COHRhoDecayer::Decay(const DecayerInputs_t & inp) const
+{
+TParticlePDG * mother = PDGLibrary::Instance()->Find(inp.PdgCode);
+
+if(!mother) {
+  LOG("Decay", pERROR)
+      <<"\n *** The particle with PDG-Code = " <<inp.PdgCode
+             <<" was not found in PDG Library";
+       return 0;
+}
+LOG("Decay", pINFO)
+       << "Decaying a " << mother->GetName()
+                        << " with P4 = " << utils::print::P4AsString(inp.P4);
+//get the mass of the mother marticle
+double W = inp.P4->M();
+LOG("Decay", pINFO) << "Available mass W = " << W;
+
+//-- Get all decay channels
+//-- Get the correct number of channels of the rho mesons
+TObjArray * decay_list = mother->DecayList();
+
+unsigned int nch = decay_list->GetEntries();
+
+LOG("Decay", pINFO)
+         << mother->GetName() << " has: " << nch << " decay channels";
+
+double BR[nch], tot_BR =0;
+
+//loop over all the decay channels
+for(unsigned int ich=0; ich < nch; ich++){
+   TDecayChannel * ch = (TDecayChannel *) decay_list->At(ich);
+   double fsmass=this->FinalStateMass(ch);
+   
+   if(fsmass < W) {
+    SLOG("Decay", pDEBUG)
+         << "Using channel: "<<ich
+            <<" with final state mass = "<< fsmass<< " GeV";
+    tot_BR +=ch->BranchingRatio();
+   } else {
+    SLOG("Decay", pINFO)
+         <<"Suppresing channel: "<<ich
+            <<" with final state mass = "<< fsmass<< " GeV";
+   } 
+   BR[ich] = tot_BR;
+
+}   
+/*if(tot_BR==0) {
+    SLOG("Decay", pWARN) 
+      << "None of the " << nch << " decay chans is available @ W = " << W;
+    return 0;    
+}*/
+//select a decay channel based on the branching ratios
+
+
+
+
+
+   //LOG("Decay", pINFO)
+   //<<"Selected "<< ch->NDaughters()<< "-particle decay chan ("
+   //<< ich <<") has BR ="<<ch->BranchingRatio();
+
+   //TLorentzVector p4(*inp.P4);
+
+   //return ( this->DecayExclusive(inp.PdgCode, p4, ch) );
+
+    
+
+
+return 0;
+}
+
+//----------------------------------------------------------------------
+void COHRhoDecayer::Initialize(void) const
+{
+
+}
+//----------------------------------------------------------------------
+TClonesArray * COHRhoDecayer::DecayExclusive(
+  int pdg_code, TLorentzVector &p, TDecayChannel * ch) const
+{
+// --Get the final state mass spectrum and the particle codes
+  unsigned int nd=ch->NDaughters();
+
+  int pdgc[nd];
+  double mass[nd];
+
+  for(unsigned int iparticle = 0; iparticle < nd; iparticle++){
+     int daughter_code = ch->DaughterPdgCode(iparticle);
+     TParticlePDG * daughter = PDGLibrary::Instance()->Find(daughter_code);
+     assert(daughter);
+
+     pdgc[iparticle] = daughter_code;
+     mass[iparticle] = daughter->Mass();
+     
+
+
+
+  } // end of loop over all the daughter particles
+
+return 0;
+}
+//---------------------------------------------------------------------
+double COHRhoDecayer::Weight(void) const
+{
+ return fWeight;
+} 
+//--------------------------------------------------------------------
+void COHRhoDecayer::InhibitDecay(int pdgc, TDecayChannel * dc) const
+{
+ if(! this->IsHandled(pdgc)) return;
+ if(!dc) return;
+
+}
+void COHRhoDecayer::UnInhibitDecay(int pdgc, TDecayChannel * dc) const
+{
+  if(! this->IsHandled(pdgc)) return;
+
+  if(!dc) return;
+
+}
+//---------------------------------------------------------------------
+double COHRhoDecayer::FinalStateMass(TDecayChannel * ch) const
+{
+double mass=0;
+unsigned int nd=ch->NDaughters();
+  for(unsigned int iparticle=0; iparticle < nd; iparticle++){
+     int daughter_code = ch->DaughterPdgCode(iparticle);
+     TParticlePDG * daughter = PDGLibrary::Instance()->Find(daughter_code);
+     assert(daughter);
+
+     double md = daughter->Mass();
+
+  }
+return mass;
+}
+//-------------------------------------------------------------
+void COHRhoDecayer::Configure(const Registry & config)
+{
+ Algorithm::Configure(config);
+ this->LoadConfig();
+}
+//----------------------------------------------------------
+void COHRhoDecayer::Configure(string config)
+{
+  Algorithm::Configure(config);
+  this->LoadConfig();
+}
+//------------------------------------------------------------
+void COHRhoDecayer::LoadConfig(void)
+{
+// Read configuration options or set defaults
+// generated weighted or un-weighted hadronic system
+ fGenerateWeighted = fConfig->GetBoolDef("generate-weighted", false);
+
+}

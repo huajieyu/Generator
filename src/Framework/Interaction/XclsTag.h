@@ -61,7 +61,8 @@ public:
   bool KnownResonance     (void) const { return (fResonance != kNoResonance); }
   Resonance_t Resonance   (void) const { return fResonance; }
   int  DecayMode          (void) const { return fDecayMode; }
-
+  int  RhoPDG             (void) const { return fRhoPDG; }
+  double RhoMass          (void) const { return fRhoMass;} 
   // Ssetting exclusive final state information
   void SetCharm       (int charm_pdgc = 0);
   void SetStrange     (int strange_pdgc = 0);
@@ -75,7 +76,8 @@ public:
   void ResetNNucleons (void);
   void SetResonance   (Resonance_t res);
   void SetDecayMode   (int decay_mode);
-
+  void SetRhoPDG (int RhoPDG0) {fRhoPDG=RhoPDG0;}
+  void SetRhoMass (double AMMES){fRhoMass=AMMES;}
   // Copy, reset, print itself and build string code
   void   Reset    (void);                          ///< reset object
   void   Copy     (const XclsTag & xcls);          ///< copy input XclsTag object
@@ -99,7 +101,8 @@ private:
   int         fNPiMinus;         ///< # of pi^-'s in the hadronic system after this Xcls reaction (before FSI)
   Resonance_t fResonance;        ///< baryon resonance excited by probe
   int         fDecayMode;
-
+  int         fRhoPDG;      
+  double         fRhoMass;
 ClassDef(XclsTag,3)
 };
 

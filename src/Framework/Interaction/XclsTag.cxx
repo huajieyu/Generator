@@ -130,6 +130,17 @@ void XclsTag::SetDecayMode(int decay_mode)
   fDecayMode = decay_mode;
 }
 //___________________________________________________________________________
+/*void XclsTag::SetRhoPDG(int RhoPDG0)
+{
+  fRhoPDG = RhoPDG0;
+}
+//___________________________________________________________________________
+void XclsTag::SetRhoMass(double AMMES)
+{
+  fRhoMass = AMMES;
+}
+*/
+//___________________________________________________________________________
 void XclsTag::Reset(void)
 {
   fIsCharmEvent     = false;
@@ -143,6 +154,8 @@ void XclsTag::Reset(void)
   fNPiMinus         = 0;
   fResonance        = kNoResonance;
   fDecayMode        = -1;
+  fRhoPDG           = -1;
+  fRhoMass          = -1.;
 }
 //___________________________________________________________________________
 void XclsTag::Copy(const XclsTag & xcls)
@@ -158,6 +171,8 @@ void XclsTag::Copy(const XclsTag & xcls)
   fNPiMinus         = xcls.fNPiMinus;
   fResonance        = xcls.fResonance;
   fDecayMode        = xcls.fDecayMode;
+  fRhoPDG           = xcls.fRhoPDG;
+  fRhoMass          = xcls.fRhoMass;
 }
 //___________________________________________________________________________
 /*

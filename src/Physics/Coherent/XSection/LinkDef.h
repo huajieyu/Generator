@@ -22,4 +22,8 @@
 #pragma link C++ class genie::COHXSec;
 #pragma link C++ class genie::COHXSecAR;
 
+#pragma link C++ class genie::COHRhoXSec;
+#pragma link C++ class genie::VectDominCOHRhoXSec;
+
+
 #endif

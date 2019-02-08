@@ -33,5 +33,6 @@
 #pragma link C++ class genie::Range1I_t;
 #pragma link C++ class genie::GSimFiles;
 #pragma link C++ class genie::utils::T2KEvGenMetaData;
-
+#pragma link C++ class genie::utils::genfun;
+#pragma link C++ class genie::utils::cohrhosigxy;
 #endif

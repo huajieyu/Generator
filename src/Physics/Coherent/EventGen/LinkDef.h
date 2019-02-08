@@ -12,5 +12,8 @@
 #pragma link C++ class genie::COHElHadronicSystemGenerator;
 #pragma link C++ class genie::COHKinematicsGenerator;
 #pragma link C++ class genie::COHElKinematicsGenerator;
-
+#pragma link C++ class genie::COHRhoHadronicSystemGenerator;
+#pragma link C++ class genie::COHRhoKinematicsGenerator;
+#pragma link C++ class genie::COHRhoPrimaryLeptonGenerator;
+#pragma link C++ class genie::COHRhoDecayer;
 #endif

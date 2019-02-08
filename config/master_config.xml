@@ -52,6 +52,9 @@
    <config alg="genie::GLRESGenerator">              GLRESGenerator.xml              </config>
    <config alg="genie::NucleonDecayPrimaryVtxGenerator"> NucleonDecayPrimaryVtxGenerator.xml </config>
    <config alg="genie::NNBarOscPrimaryVtxGenerator">     NNBarOscPrimaryVtxGenerator.xml     </config>
+   <config alg="genie::COHRhoHadronicSystemGenerator"> COHRhoHadronicSystemGenerator.xml </config>
+   <config alg="genie::COHRhoKinematicsGenerator">     COHRhoKinematicsGenerator.xml     </config>
+   <config alg="genie::COHRhoPrimaryLeptonGenerator">  COHRhoPrimaryLeptonGenerator.xml  </config>
 
    <!-- ****** CONFIGURATION FOR LIST-GENERATORS ****** -->
    <config alg="genie::QELInteractionListGenerator">           QELInteractionListGenerator.xml       </config>
@@ -95,6 +98,7 @@
    <!-- ****** CONFIGURATION FOR PARTICLE DECAY ALGORITHMS****** -->
    <config alg="genie::PythiaDecayer">               PythiaDecayer.xml               </config>
    <config alg="genie::BaryonResonanceDecayer">      BaryonResonanceDecayer.xml      </config>
+   <config alg="genie::COHRhoDecayer">               COHRhoDecayer.xml               </config>
 
    <!--  ****** CONFIGURATION FORM FACTOR and STRUCTURE FUNCTION ALGORITHMS ****** -->
    <config alg="genie::DipoleELFormFactorsModel">                DipoleELFormFactorsModel.xml                </config>
@@ -130,7 +134,8 @@
    <config alg="genie::NuElectronXSec">              NuElectronXSec.xml              </config>
    <config alg="genie::DMELXSec">                    DMELXSec.xml                    </config>
    <config alg="genie::DMDISXSec">                   DMDISXSec.xml                   </config>
-
+   <config alg="genie::COHRhoXSec">                  COHRhoXSec.xml                  </config>
+ 
    <!--  ****** CONFIGURATION FOR XSEC ALGORITHMS ****** -->
    <config alg="genie::AhrensNCELPXSec">                    AhrensNCELPXSec.xml                    </config>
    <config alg="genie::AhrensDMELPXSec">                    AhrensDMELPXSec.xml                    </config>
@@ -168,6 +173,7 @@
    <config alg="genie::DummyPXSec">                         Default.xml                            </config>
    <config alg="genie::NNBarOscDummyPXSec">                 Default.xml                            </config>
    <config alg="genie::ReinSehgalRESXSecFast">              ReinSehgalRESXSecFast.xml              </config>
+   <config alg="genie::VectDominCOHRhoXSec">                VectDominCOHRhoXSec.xml                </config>
 
    <!--  ****** CONFIGURATION FOR NUCLEAR ENV. ALGORITHMS ****** -->
    <config alg="genie::NuclearModelMap">             NuclearModelMap.xml             </config>

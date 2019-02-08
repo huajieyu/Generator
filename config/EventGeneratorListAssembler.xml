@@ -203,6 +203,11 @@ Generator-%d                alg     No
      <param type="alg" name="Generator-0">   genie::EventGenerator/COH-NC    </param>
   </param_set>
 
+  <param_set name="COHRHO">
+     <param type="int" name="NGenerators">    1                               </param>
+     <param type="alg" name="Generator-0 ">   genie::EventGenerator/COH-RHO    </param>
+  </param_set>
+
   <param_set name="DIS"> 
      <param type="int" name="NGenerators">    2                               </param>
      <param type="alg" name="Generator-0 ">   genie::EventGenerator/DIS-CC    </param>

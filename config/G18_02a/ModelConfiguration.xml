@@ -110,6 +110,7 @@ STFC, Rutherford Appleton Laboratory
   <param type="alg" name="XSecModel@genie::EventGenerator/COH-CC">         genie::BergerSehgalCOHPiPXSec2015/Default   </param>
   <param type="alg" name="XSecModel@genie::EventGenerator/COH-NC">         genie::BergerSehgalCOHPiPXSec2015/Default   </param>
 
+  <param type="alg" name="XSecModel@genie::EventGenerator/COH-RHO">        genie::VectDominCOHRhoXSec/Default   </param>
 
   <!-- Alvarez-Ruso et al COH pion
   <param type="alg" name="XSecModel@genie::EventGenerator/COH-CC">       genie::AlvarezRusoCOHPiPXSec/Fast       </param>
